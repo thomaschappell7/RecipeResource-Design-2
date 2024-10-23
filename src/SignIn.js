@@ -135,15 +135,15 @@ const SignIn = ({ onSignIn, onSignOut }) => {
       <Header>
         <IconButton
           sx={{
-            position: 'absolute',
-            top: '50%',
-            right: '16px',
-            transform: 'translateY(-50%)',
+            position: "absolute",
+            top: "50%",
+            right: "16px",
+            transform: "translateY(-50%)",
           }}
           onClick={handleMenuOpen}
 
         >
-          <MenuIcon />
+          <MenuIcon /> {/* Replaced with hamburger menu icon */}
         </IconButton>
               <Menu
                   anchorEl={anchorEl}
