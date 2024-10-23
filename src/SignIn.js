@@ -8,9 +8,12 @@ import {
   Paper,
   TextField,
   Typography,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Header component styling
 const Header = styled(Box)(({ theme }) => ({
@@ -57,6 +60,9 @@ const FormContainer = styled(Paper)(({ theme }) => ({
 const SignIn = ({ onSignIn }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const navigate = useNavigate();
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -74,7 +80,28 @@ const SignIn = ({ onSignIn }) => {
 
         setEmail('');
         setPassword('');
+
+        navigate("/recipes");
     };
+
+    
+
+    // Open the menu
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    // Close the menu
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    // Navigate to different pages
+    const handleMenuClick = (path) => {
+        navigate(path);
+        handleMenuClose();
+    };
+
   return (
     <Box
       component="form"
@@ -98,9 +125,31 @@ const SignIn = ({ onSignIn }) => {
             right: '16px',
             transform: 'translateY(-50%)',
           }}
+          onClick={handleMenuOpen}
+
         >
           <MenuIcon />
         </IconButton>
+              <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                  }}
+              >
+                  {/* Menu Items */}
+                  <MenuItem onClick={() => handleMenuClick('/recipes')}>Home Page</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('/favorite-recipes')}>Favorite Recipes</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('/cooking-history')}>Cooking History</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('/account-settings')}>Account Settings</MenuItem>
+              </Menu>
+
         <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
       </Header>
 
