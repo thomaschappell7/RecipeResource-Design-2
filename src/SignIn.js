@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React from "react";
+import React, { useState } from "react";
 
 // Header component styling
 const Header = styled(Box)(({ theme }) => ({
@@ -54,9 +54,31 @@ const FormContainer = styled(Paper)(({ theme }) => ({
 }));
 
 // SignIn Component
-const SignIn = () => {
+const SignIn = ({ onSignIn }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        // TODO store user info
+        const emailPrefix = email.split('@')[0];
+        const userInfo = {
+            email,
+            password,
+            emailPrefix,
+        };
+
+        localStorage.setItem('user', JSON.stringify(userInfo));
+
+        onSignIn();
+
+        setEmail('');
+        setPassword('');
+    };
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         minHeight: '100vh',
         width: '100%',
@@ -124,6 +146,7 @@ const SignIn = () => {
               variant="outlined"
               margin="dense" // Reduce padding inside the TextField
               placeholder="Enter your email"
+              name="email"
             />
 
             {/* Password Label */}
@@ -140,15 +163,16 @@ const SignIn = () => {
               margin="dense" // Use smaller margin for compact layout
               type="password"
               placeholder="Enter your password"
+              name="password"
             />
 
             <Box
               sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}
             >
-              <Button variant="contained" color="primary">
+              <Button type="submit" variant="contained" color="primary">
                 Sign in
               </Button>
-              <Button variant="contained" color="success">
+              <Button type="submit" variant="contained" color="success">
                 Register
               </Button>
             </Box>

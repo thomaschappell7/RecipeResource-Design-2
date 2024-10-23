@@ -1,5 +1,5 @@
 // App.js
-import React from "react";
+import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline"; // Optional: Reset CSS styles
 import SignIn from "./SignIn";
@@ -26,10 +26,18 @@ const theme = createTheme({
 });
 
 function App() {
+    const [isSignedIn, setIsSignedIn] = useState(false);
+    const handleSignIn = () => {
+        setIsSignedIn(true);
+    };
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Resets browser styles */}
-      <Recipes />
+          {isSignedIn ? (
+              <Recipes />
+          ) : (
+              <SignIn onSignIn={handleSignIn} />
+          )}
     </ThemeProvider>
   );
 }
