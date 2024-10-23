@@ -8,9 +8,12 @@ import {
   Paper,
   TextField,
   Typography,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Header component styling
 const Header = styled(Box)(({ theme }) => ({
@@ -54,9 +57,55 @@ const FormContainer = styled(Paper)(({ theme }) => ({
 }));
 
 // SignIn Component
-const SignIn = () => {
+const SignIn = ({ onSignIn }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const navigate = useNavigate();
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        // TODO store user info
+        const emailPrefix = email.split('@')[0];
+        const userInfo = {
+            email,
+            password,
+            emailPrefix,
+        };
+
+        localStorage.setItem('user', JSON.stringify(userInfo));
+
+        onSignIn();
+
+        setEmail('');
+        setPassword('');
+
+        navigate("/recipes");
+    };
+
+    
+
+    // Open the menu
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    // Close the menu
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    // Navigate to different pages
+    const handleMenuClick = (path) => {
+        navigate(path);
+        handleMenuClose();
+    };
+
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         minHeight: '100vh',
         width: '100%',
@@ -76,9 +125,31 @@ const SignIn = () => {
             right: "16px",
             transform: "translateY(-50%)",
           }}
+          onClick={handleMenuOpen}
+
         >
           <MenuIcon /> {/* Replaced with hamburger menu icon */}
         </IconButton>
+              <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                  }}
+              >
+                  {/* Menu Items */}
+                  <MenuItem onClick={() => handleMenuClick('/recipes')}>Home Page</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('/favorite-recipes')}>Favorite Recipes</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('/cooking-history')}>Cooking History</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('/account-settings')}>Account Settings</MenuItem>
+              </Menu>
+
         <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
       </Header>
 
@@ -124,6 +195,7 @@ const SignIn = () => {
               variant="outlined"
               margin="dense" // Reduce padding inside the TextField
               placeholder="Enter your email"
+              name="email"
             />
 
             {/* Password Label */}
@@ -140,15 +212,16 @@ const SignIn = () => {
               margin="dense" // Use smaller margin for compact layout
               type="password"
               placeholder="Enter your password"
+              name="password"
             />
 
             <Box
               sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}
             >
-              <Button variant="contained" color="primary">
+              <Button type="submit" variant="contained" color="primary">
                 Sign in
               </Button>
-              <Button variant="contained" color="success">
+              <Button type="submit" variant="contained" color="success">
                 Register
               </Button>
             </Box>
