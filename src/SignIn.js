@@ -71,13 +71,13 @@ const SignIn = () => {
       <Header>
         <IconButton
           sx={{
-            position: 'absolute',
-            top: '50%',
-            right: '16px',
-            transform: 'translateY(-50%)',
+            position: "absolute",
+            top: "50%",
+            right: "16px",
+            transform: "translateY(-50%)",
           }}
         >
-          <MenuIcon />
+          <MenuIcon /> {/* Replaced with hamburger menu icon */}
         </IconButton>
         <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
       </Header>

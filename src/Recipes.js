@@ -1,6 +1,6 @@
+import MenuIcon from "@mui/icons-material/Menu"; 
 import {
   FavoriteBorder,
-  MoreVert,
   Search,
   Timer,
   ExpandMore as ExpandMoreIcon,
@@ -23,72 +23,90 @@ import {
   ListItemText,
   TextField,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import React, { useState } from "react";
 
 // Restrictions Component
 const Restrictions = () => {
-  const restrictionOptions = [
-    "No meat",
-    "No nuts",
-    "No eggs",
-    "No gluten",
-    "No shellfish",
-    "No lactose",
-  ];
-
-  return (
-    <Box
-      sx={{
-        width: "300px",
-        marginTop: 2,
-        padding: 2,
-        bgcolor: "white",
-        borderRadius: "8px",
-        border: "1px solid #b0bec5",
-        boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <Typography
-        variant="h4"
+    const restrictionOptions = [
+      "No meat",
+      "No nuts",
+      "No eggs",
+      "No gluten",
+      "No shellfish",
+      "No lactose",
+    ];
+  
+    const [selectedRestrictions, setSelectedRestrictions] = useState([]);
+  
+    const handleCheckboxChange = (event) => {
+      const { name, checked } = event.target;
+      setSelectedRestrictions((prev) =>
+        checked
+          ? [...prev, name] // Add to the array if checked
+          : prev.filter((restriction) => restriction !== name) // Remove if unchecked
+      );
+    };
+  
+    return (
+      <Box
         sx={{
-          fontFamily: "Nunito-Bold, Helvetica",
-          fontWeight: "bold",
-          color: "#f5a623",
-          textAlign: "center",
-          marginBottom: 2,
+          width: "300px",
+          marginTop: 2,
+          padding: 2,
+          bgcolor: "white",
+          borderRadius: "8px",
+          border: 1,
+          borderColor: "#303030",
+          boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
         }}
       >
-        Restrictions
-      </Typography>
-
-      <Grid container spacing={2}>
-        {restrictionOptions.map((option, index) => (
-          <Grid item xs={6} key={index}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <input
-                type="radio"
-                name="restriction"
-                id={`restriction-${index}`}
-                style={{ transform: "scale(1.2)" }}
-              />
-              <label
-                htmlFor={`restriction-${index}`}
-                style={{
-                  fontFamily: "Nunito-Medium, Helvetica",
-                  color: "#313043",
-                }}
-              >
-                {option}
-              </label>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
-};
+        <Typography
+          variant="h4"
+          sx={{
+            fontFamily: "Nunito-Bold, Helvetica",
+            fontWeight: "bold",
+            color: "#f5a623",
+            textAlign: "center",
+            marginBottom: 2,
+          }}
+        >
+          Restrictions
+        </Typography>
+  
+        <Grid container spacing={2}>
+          {restrictionOptions.map((option, index) => (
+            <Grid item xs={6} key={index}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <input
+                  type="checkbox"
+                  name={option}
+                  id={`restriction-${index}`}
+                  onChange={handleCheckboxChange}
+                  checked={selectedRestrictions.includes(option)}
+                  style={{ transform: "scale(1.2)" }}
+                />
+                <label
+                  htmlFor={`restriction-${index}`}
+                  style={{
+                    fontFamily: "Nunito-Medium, Helvetica",
+                    color: "#313043",
+                  }}
+                >
+                  {option}
+                </label>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    );
+  };
 
 // Header styling
 const Header = styled(Box)(({ theme }) => ({
@@ -112,6 +130,24 @@ const Logo = styled("img")({
   height: "72px",
   objectFit: "cover",
 });
+
+// Custom styled card with hover effect
+const StyledCard = styled(Card)(({ theme }) => ({
+    width: "100%",
+    height: 320,
+    bgcolor: "neutral.100",
+    border: "1px solid #000000",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    padding: "8px",
+    cursor: "pointer", // Make it look clickable
+    transition: "transform 0.3s, box-shadow 0.3s", // Smooth transition effect
+    "&:hover": {
+      transform: "scale(1.05)", // Slightly raise the card on hover
+      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)", // Add shadow effect
+    },
+  }));
 
 // Divider styling
 const StyledDivider = styled(Divider)({
@@ -220,9 +256,29 @@ const Recipes = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const contentWidth = { xs: "100%", sm: "600px", md: "900px" };
   
+    // State to control the dialog visibility
+    const [open, setOpen] = useState(false);
+    const [selectedRecipe, setSelectedRecipe] = useState(null); // Store selected recipe info
+  
     const handleSearch = (event) => {
       setSearchTerm(event.target.value);
     };
+  
+    const handleOpen = (recipe) => {
+      setSelectedRecipe(recipe); // Set the selected recipe
+      setOpen(true); // Open the dialog
+    };
+  
+    const handleClose = () => {
+      setOpen(false); // Close the dialog
+      setSelectedRecipe(null); // Clear selected recipe
+    };
+  
+    const recipes = Array(6).fill({
+      title: "Recipe Title",
+      description: "This is a sample recipe description.",
+      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
+    });
   
     return (
       <Box
@@ -234,6 +290,7 @@ const Recipes = () => {
           paddingTop: "100px",
         }}
       >
+        {/* Header Section */}
         <Header>
           <IconButton
             sx={{
@@ -243,43 +300,45 @@ const Recipes = () => {
               transform: "translateY(-50%)",
             }}
           >
-            <MoreVert />
+            <MenuIcon /> {/* Hamburger menu icon */}
           </IconButton>
           <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
         </Header>
   
-        <Box
-          sx={{
+        {/* Search Section */}
+            <Box
+            sx={{
             width: contentWidth,
             marginTop: 4,
             marginLeft: "90px",
             display: "flex",
             alignItems: "center",
             gap: 2,
-          }}
+            }}
         >
-          <CustomTextField
+            <CustomTextField
             value={searchTerm}
             onChange={handleSearch}
             variant="standard"
             placeholder="Search"
             fullWidth
             InputProps={{ disableUnderline: true }}
-          />
-          <Button
+            />
+            <Button
             variant="contained"
             sx={{
-              bgcolor: "#f5a623",
-              color: "white",
-              "&:hover": { bgcolor: "#e6951c" },
-              height: "44px",
-              borderRadius: "4px",
+                bgcolor: "#f5a623",
+                color: "white",
+                "&:hover": { bgcolor: "#e6951c" },
+                height: "44px",
+                borderRadius: "4px",
             }}
-          >
+            >
             Filter
-          </Button>
+            </Button>
         </Box>
   
+        {/* Main Content Section */}
         <Box
           sx={{
             display: "flex",
@@ -289,56 +348,52 @@ const Recipes = () => {
             flexWrap: "wrap",
           }}
         >
-          {/* Recipe Cards */}
-          <Grid container spacing={3} sx={{ width: contentWidth }}>
-            {Array(6)
-              .fill()
-              .map((_, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    sx={{
-                      height: 320,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      padding: 2,
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="150"
-                      image={`${process.env.PUBLIC_URL}/assets/Image.png`}
-                      alt="Recipe Image"
-                    />
-                    <CardContent>
-                      <Typography variant="h6" color="#1d1b20">
-                        Recipe Title
-                      </Typography>
-                      <Typography variant="body2" color="#49454F">
-                        Description
-                      </Typography>
-                      <Typography variant="caption" color="#49454F">
-                        Missing X ingredients...
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <FavoriteBorder />
-                      <Timer fontSize="small" />
-                      <Typography variant="caption" color="#f20597">
-                        20 min
-                      </Typography>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
+          {/* Recipe Cards with Clickable Pop-Up */}
+          <Grid
+            container
+            spacing={5}
+            sx={{
+              width: contentWidth,
+              maxWidth: "900px",
+            }}
+          >
+            {recipes.map((recipe, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+              <StyledCard onClick={() => handleOpen(recipe)}>
+                <CardMedia
+                  component="img"
+                  height="150"
+                  image={recipe.image}
+                  alt="Recipe Image"
+                />
+                <CardContent>
+                  <Typography variant="h6" color="#1d1b20">
+                    {recipe.title}
+                  </Typography>
+                  <Typography variant="body2" color="#49454F">
+                    {recipe.description}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <FavoriteBorder />
+                  <Timer fontSize="small" />
+                  <Typography variant="caption" color="#f20597">
+                    20 min
+                  </Typography>
+                </CardActions>
+              </StyledCard>
+            </Grid>
+            ))}
           </Grid>
   
           {/* Pantry and Restrictions Section */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column", // Align vertically
-              gap: 2, // Space between Pantry and Restrictions
+              flexDirection: "column",
+              gap: 2,
+              width: "300px",
+              ml: 10, // Move to the right
             }}
           >
             <Pantry />
@@ -346,7 +401,125 @@ const Recipes = () => {
           </Box>
         </Box>
   
-        <StyledDivider />
+        {/* Dialog for Recipe Details */}
+        <Dialog
+  open={open}
+  onClose={handleClose}
+  maxWidth="md"
+  fullWidth
+  sx={{
+    "& .MuiDialog-paper": {
+      borderRadius: "12px",
+      padding: "16px",
+      maxHeight: "80vh", // Control max height of the dialog
+    },
+  }}
+>
+  <DialogContent>
+    <Box sx={{ display: "flex", gap: 2 }}>
+      {/* Image Section */}
+      <img
+        src={selectedRecipe?.image}
+        alt="Recipe Image"
+        style={{
+          width: "40%",
+          height: "auto",
+          borderRadius: "8px",
+        }}
+      />
+
+      {/* Recipe Details Section */}
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="h4" gutterBottom>
+          {selectedRecipe?.title}
+        </Typography>
+
+        {/* Dots representing rating */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {[...Array(5)].map((_, index) => (
+            <img
+              key={index}
+              src={`${process.env.PUBLIC_URL}/assets/image%20${index + 11}.png`}
+              alt={`Dot ${index + 11}`}
+              width={22}
+              height={22}
+              style={{ transform: "scale(0.9)" }}
+            />
+          ))}
+        </Box>
+
+        {/* Timer and Duration */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, marginTop: 1 }}>
+          <Timer fontSize="small" />
+          <Typography variant="body2" color="textSecondary">
+            20 min
+          </Typography>
+        </Box>
+
+        {/* Save for Later Button */}
+        <Button
+          variant="outlined"
+          startIcon={<FavoriteBorder />}
+          sx={{ marginTop: 1 }}
+        >
+          Save for later
+        </Button>
+
+        {/* Recipe Description */}
+        <Typography variant="body1" sx={{ marginTop: 2 }}>
+          {selectedRecipe?.description}
+        </Typography>
+
+        {/* Ingredient List */}
+        <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
+          Ingredient List:
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          {/* Example ingredient list - replace with dynamic content */}
+          - 1 cup flour <br />
+          - 2 eggs <br />
+          - 1/2 cup sugar
+        </Typography>
+      </Box>
+    </Box>
+
+    {/* Divider Line */}
+    <Divider sx={{ marginY: 2 }} />
+
+    {/* Scrollable Cooking Instructions */}
+    <Box
+      sx={{
+        maxHeight: "30vh", // Limit the height of this section
+        overflowY: "auto", // Enable vertical scrolling
+        paddingRight: 1, // Add padding for scrollbar clearance
+      }}
+    >
+      <Typography variant="h5" gutterBottom>
+        Cooking Instructions
+      </Typography>
+      <Typography variant="body2">
+        Step 1: Preheat the oven to 350°F (175°C). <br />
+        Step 2: Mix the flour, sugar, and eggs in a bowl. <br />
+        Step 3: Pour the mixture into a baking pan and smooth the top. <br />
+        Step 4: Bake for 20 minutes or until golden brown. <br />
+        Step 5: Let cool before serving. Enjoy! <br />
+        {/* Add more steps to test scrolling behavior */}
+        Step 6: Optional - add frosting or toppings of choice. <br />
+        Step 7: Store any leftovers in the refrigerator for up to 5 days. <br />
+        Step 8: Reheat in the oven at 300°F for 5-10 minutes if desired.
+      </Typography>
+    </Box>
+  </DialogContent>
+
+  <DialogActions>
+    <Button onClick={handleClose} color="primary">
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+
+  
+        <Divider />
       </Box>
     );
   };
