@@ -259,6 +259,17 @@ const Recipes = () => {
     // State to control the dialog visibility
     const [open, setOpen] = useState(false);
     const [selectedRecipe, setSelectedRecipe] = useState(null); // Store selected recipe info
+
+    // Update favorite state to track favorites for each recipe
+    const [favoriteRecipes, setFavoriteRecipes] = useState({});
+
+    // Favorite toggle function
+    const toggleFavorite = (index) => {
+        setFavoriteRecipes((prevFavorites) => ({
+            ...prevFavorites,
+            [index]: !prevFavorites[index], // Toggle the favorite status for the specific recipe
+        }));
+    };
   
     const handleSearch = (event) => {
       setSearchTerm(event.target.value);
@@ -274,7 +285,7 @@ const Recipes = () => {
       setSelectedRecipe(null); // Clear selected recipe
     };
   
-    const recipes = Array(6).fill({
+    const recipes = Array(9).fill({
       title: "Recipe Title",
       description: "This is a sample recipe description.",
       image: `${process.env.PUBLIC_URL}/assets/Image.png`,
@@ -322,7 +333,8 @@ const Recipes = () => {
             variant="standard"
             placeholder="Search"
             fullWidth
-            InputProps={{ disableUnderline: true }}
+            InputProps={{ disableUnderline: true,
+            style : {paddingLeft: "10px"}}}
             />
             <Button
             variant="contained"
@@ -348,10 +360,21 @@ const Recipes = () => {
             flexWrap: "wrap",
           }}
         >
+
+        {/* Box for Recipe Card Grid - needed to add scroll functionality */}
+        <Box
+            sx={{
+                maxHeight: "600px", // Set a maximum height for the scrollable area
+                overflowY: "auto", // Enable vertical scrolling when content exceeds max height
+                paddingRight: 1, // Optional: Add padding to account for scroll bar width
+                width: "60%", // Make the Box take the full width of the parent container
+            }}
+        >
+
           {/* Recipe Cards with Clickable Pop-Up */}
           <Grid
             container
-            spacing={5}
+            spacing={4}
             sx={{
               width: contentWidth,
               maxWidth: "900px",
@@ -375,7 +398,13 @@ const Recipes = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <FavoriteBorder />
+                  <FavoriteBorder
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering card click
+                        toggleFavorite(index); // Pass the index to toggle favorite
+                      }}
+                      style={{ color: favoriteRecipes[index] ? 'red' : 'gray', cursor: 'pointer' }} // Change color based on favorite status
+                  />
                   <Timer fontSize="small" />
                   <Typography variant="caption" color="#f20597">
                     20 min
@@ -385,7 +414,8 @@ const Recipes = () => {
             </Grid>
             ))}
           </Grid>
-  
+        </Box>
+
           {/* Pantry and Restrictions Section */}
           <Box
             sx={{
@@ -461,6 +491,7 @@ const Recipes = () => {
           variant="outlined"
           startIcon={<FavoriteBorder />}
           sx={{ marginTop: 1 }}
+          onClick = {toggleFavorite}
         >
           Save for later
         </Button>
