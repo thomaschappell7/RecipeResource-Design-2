@@ -58,7 +58,7 @@ function App() {
                           <Route path="/recipes" element={<Recipes />} />
                           {/*<Route path="/favorite-recipes" element={<FavoriteRecipes />} />*/}
                           {/*<Route path="/cooking-history" element={<CookingHistory />} />*/}
-                          <Route path="/account-settings" element={<AccountSettings />} />
+                              <Route path="/account-settings" element={<AccountSettings onSignOut={handleSignOut} />} />
                           <Route path="*" element={<Navigate to="/recipes" />} />
                       </>
                   )}
