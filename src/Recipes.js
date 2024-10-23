@@ -33,6 +33,7 @@ import {
 import { styled } from "@mui/system";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { recipesData } from "./recipesData";
 
 
 // Restrictions Component
@@ -289,11 +290,7 @@ const Recipes = () => {
       setSelectedRecipe(null); // Clear selected recipe
     };
   
-    const recipes = Array(9).fill({
-      title: "Recipe Title",
-      description: "This is a sample recipe description.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    });
+    const recipes = recipesData || [];
 
     {/*Menu Code*/ }
 
@@ -453,7 +450,7 @@ const Recipes = () => {
                   />
                   <Timer fontSize="small" />
                   <Typography variant="caption" color="#f20597">
-                    20 min
+                                {recipe.time}
                   </Typography>
                 </CardActions>
               </StyledCard>
@@ -495,14 +492,16 @@ const Recipes = () => {
     <Box sx={{ display: "flex", gap: 2 }}>
       {/* Image Section */}
       <img
-        src={selectedRecipe?.image}
-        alt="Recipe Image"
-        style={{
-          width: "40%",
-          height: "auto",
-          borderRadius: "8px",
-        }}
-      />
+            src={selectedRecipe?.image}
+            alt="Recipe Image"
+            style={{
+                width: "40%",       
+                height: "auto",     
+                borderRadius: "8px", 
+                objectFit: "cover", 
+                maxWidth: "100%",  
+            }}
+        />
 
       {/* Recipe Details Section */}
       <Box sx={{ flex: 1 }}>
@@ -528,7 +527,7 @@ const Recipes = () => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, marginTop: 1 }}>
           <Timer fontSize="small" />
           <Typography variant="body2" color="textSecondary">
-            20 min
+            {selectedRecipe?.time}
           </Typography>
         </Box>
 
@@ -548,15 +547,18 @@ const Recipes = () => {
         </Typography>
 
         {/* Ingredient List */}
-        <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
-          Ingredient List:
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          {/* Example ingredient list - replace with dynamic content */}
-          - 1 cup flour <br />
-          - 2 eggs <br />
-          - 1/2 cup sugar
-        </Typography>
+                            <Typography variant="subtitle1" sx={{ marginTop: 2, marginBottom: 0 }}>
+                                Ingredient List:
+                            </Typography>
+                            <ul style={{ marginTop: 0, paddingLeft: '20px' }}>
+                                {selectedRecipe?.ingredients?.map((ingredient, index) => (
+                                    <li key={index}>
+                                        <Typography variant="body2" color="textSecondary" component="span">
+                                            {ingredient}
+                                        </Typography>
+                                    </li>
+                                ))}
+                            </ul>
       </Box>
     </Box>
 
