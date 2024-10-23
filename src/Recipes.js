@@ -26,10 +26,14 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
+    DialogActions,
+    Menu,
+  MenuItem
 } from "@mui/material";
 import { styled } from "@mui/system";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 // Restrictions Component
 const Restrictions = () => {
@@ -290,6 +294,27 @@ const Recipes = () => {
       description: "This is a sample recipe description.",
       image: `${process.env.PUBLIC_URL}/assets/Image.png`,
     });
+
+    {/*Menu Code*/ }
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const navigate = useNavigate();
+
+    // Open the menu
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    // Close the menu
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    // Navigate to different pages
+    const handleMenuClick = (path) => {
+        navigate(path);
+        handleMenuClose();
+    };
   
     return (
       <Box
@@ -303,16 +328,37 @@ const Recipes = () => {
       >
         {/* Header Section */}
         <Header>
-          <IconButton
-            sx={{
-              position: "absolute",
-              top: "50%",
-              right: "16px",
-              transform: "translateY(-50%)",
-            }}
-          >
-            <MenuIcon /> {/* Hamburger menu icon */}
-          </IconButton>
+                <IconButton
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        right: "16px",
+                        transform: "translateY(-50%)",
+                    }}
+                    onClick={handleMenuOpen}
+
+                >
+                    <MenuIcon /> 
+                </IconButton>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                >
+                    {/* Menu Items */}
+                    <MenuItem onClick={() => handleMenuClick('/recipes')}>Home Page</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick('/favorite-recipes')}>Favorite Recipes</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick('/cooking-history')}>Cooking History</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick('/account-settings')}>Account Settings</MenuItem>
+                </Menu>
           <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
         </Header>
   
