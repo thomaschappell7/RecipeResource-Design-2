@@ -3,6 +3,7 @@ import React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline"; // Optional: Reset CSS styles
 import SignIn from "./SignIn";
+import Recipes from './Recipes';
 
 // Create a custom theme
 const theme = createTheme({
@@ -28,7 +29,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Resets browser styles */}
-      <SignIn />
+      <Recipes />
     </ThemeProvider>
   );
 }
