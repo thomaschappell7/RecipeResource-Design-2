@@ -1,24 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline"; // Optional: Reset CSS styles
+import SignIn from "./SignIn";
+
+// Create a custom theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#f29057", // Your custom primary color
+    },
+    success: {
+      main: "#4caf50", // Your custom success color
+    },
+    divider: "#e0e0e0", // Your divider color
+    grey: {
+      100: "#f5f5f5", // Light grey background color
+    },
+  },
+  shape: {
+    borderRadius: 8, // Consistent border radius
+  },
+  spacing: 8, // 8px spacing unit
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* Resets browser styles */}
+      <SignIn />
+    </ThemeProvider>
   );
 }
 
