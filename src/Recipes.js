@@ -577,15 +577,13 @@ const Recipes = () => {
         Cooking Instructions
       </Typography>
       <Typography variant="body2">
-        Step 1: Preheat the oven to 350°F (175°C). <br />
-        Step 2: Mix the flour, sugar, and eggs in a bowl. <br />
-        Step 3: Pour the mixture into a baking pan and smooth the top. <br />
-        Step 4: Bake for 20 minutes or until golden brown. <br />
-        Step 5: Let cool before serving. Enjoy! <br />
-        {/* Add more steps to test scrolling behavior */}
-        Step 6: Optional - add frosting or toppings of choice. <br />
-        Step 7: Store any leftovers in the refrigerator for up to 5 days. <br />
-        Step 8: Reheat in the oven at 300°F for 5-10 minutes if desired.
+        <Box>
+            {selectedRecipe?.instructions?.map((step, index) => (
+            <Typography variant="body2" key={index} gutterBottom>
+                {step}
+            </Typography>
+            ))}
+        </Box>
       </Typography>
     </Box>
   </DialogContent>

@@ -65,7 +65,7 @@ export const recipesData = [
         ],
         instructions: [
             "Step 1: Cook the pasta in salted water until al dente.",
-            "Step 2: In a pan, sauté bell peppers and tomatoes in olive oil.",
+            "Step 2: In a pan, saute bell peppers and tomatoes in olive oil.",
             "Step 3: Add garlic and cook for 1 minute.",
             "Step 4: Toss in the pasta and Parmesan cheese before serving."
         ],
@@ -101,8 +101,8 @@ export const recipesData = [
         ],
         instructions: [
             "Step 1: Cook rice and black beans until tender.",
-            "Step 2: Sauté onion and garlic in olive oil.",
-            "Step 3: Mix the rice, beans, tomatoes, and sautéed onions together.",
+            "Step 2: Saute onion and garlic in olive oil.",
+            "Step 3: Mix the rice, beans, tomatoes, and sauteed onions together.",
             "Step 4: Stuff the bell peppers with the mixture and bake for 30 minutes."
         ],
         rating: 4.7,
