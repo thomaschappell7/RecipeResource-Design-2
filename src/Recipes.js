@@ -37,6 +37,12 @@ import { recipesData } from "./recipesData";
 import { pantryData } from "./pantryData";
 
 
+
+
+
+
+
+
 // Restrictions Component
 const Restrictions = () => {
     const restrictionOptions = [
@@ -318,6 +324,22 @@ const Recipes = () => {
         }
       });
 
+    // State to track cooking history
+    const [cookingHistory, setCookingHistory] = useState(() => {
+      try {
+        const storedHistory = JSON.parse(localStorage.getItem("cookingHistory"));
+        return storedHistory || [];
+      } catch (error) {
+        console.error("Failed to parse cooking history from localStorage", error);
+        return [];
+      }
+    });
+
+     // Sync cooking history with localStorage
+  useEffect(() => {
+    localStorage.setItem("cookingHistory", JSON.stringify(cookingHistory));
+  }, [cookingHistory]);
+
     // Sync favorites with localStorage whenever it changes
     useEffect(() => {
         localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -325,6 +347,8 @@ const Recipes = () => {
 
     // Toggle the favorite status of a recipe
     const toggleFavorite = (recipe) => {
+        if (!recipe) return;
+        
         const isAlreadyFavorite = favorites.some((fav) => fav.id === recipe.id);
       
         // Create a sanitized version of the recipe with only necessary properties
@@ -345,12 +369,41 @@ const Recipes = () => {
         setFavorites(updatedFavorites);
       };
 
+    // Safely toggle cooking history
+    const toggleCooked = (recipe) => {
+      if (!recipe) return; // Ensure recipe is defined
+
+      const updatedHistory = isCooked(recipe)
+        ? cookingHistory.filter((item) => item.id !== recipe.id)
+        : [...cookingHistory, recipe];
+
+      setCookingHistory(updatedHistory);
+      localStorage.setItem("cookingHistory", JSON.stringify(updatedHistory));
+    };
+
+    // Toggle the cooking history status of a recipe
+    const toggleCookingHistory = (recipe) => {
+      const isAlreadyCooked = cookingHistory.some((item) => item.id === recipe.id);
+
+      const updatedHistory = isAlreadyCooked
+        ? cookingHistory.filter((item) => item.id !== recipe.id) // Remove if already cooked
+        : [...cookingHistory, recipe]; // Add if not cooked yet
+
+      setCookingHistory(updatedHistory);
+    };
     
     // Check if the recipe exists before accessing its properties
     const isFavorite = (recipe) => {
       if (!recipe) return false; // Handle null or undefined recipe
       return favorites.some((fav) => fav.id === recipe.id);
     };
+
+    // Check if the recipe is already in cooking history
+    const isCooked = (recipe) => {
+      if (!recipe || !recipe.id) return false; // Safeguard to ensure recipe and id exist
+      return cookingHistory.some((item) => item.id === recipe.id);
+    };
+    
   
     const handleSearch = (event) => {
       setSearchTerm(event.target.value);
@@ -599,21 +652,38 @@ const Recipes = () => {
           </Typography>
         </Box>
 
-        {/* Save for Later Button */}
-        <Button
-          variant="outlined"
-          startIcon={<FavoriteBorder />}
-          sx={{
-            marginTop: 1,
-            bgcolor: isFavorite(selectedRecipe) ? "#e6951c" : "transparent",
-            color: isFavorite(selectedRecipe) ? "white" : "black",
-            "&:hover": { bgcolor: "#e6951c", color: "white" },
-            borderColor: isFavorite(selectedRecipe) ? "#e6951c" : "black",
-          }}
-          onClick={() => toggleFavorite(selectedRecipe)}
-        >
-          {isFavorite(selectedRecipe) ? "Remove from Favorites" : "Save for Later"}
-        </Button>
+        {/* Save for Later and Already Cooked Buttons */}
+        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+  {/* Save for Later Button */}
+  <Button
+    variant="outlined"
+    startIcon={<FavoriteBorder />}
+    onClick={() => toggleFavorite(selectedRecipe)}
+    sx={{
+      bgcolor: isFavorite(selectedRecipe) ? "#e6951c" : "transparent",
+      color: isFavorite(selectedRecipe) ? "white" : "black",
+      "&:hover": { bgcolor: "#e6951c", color: "white" },
+      borderColor: isFavorite(selectedRecipe) ? "#e6951c" : "black",
+    }}
+  >
+    {isFavorite(selectedRecipe) ? "Remove from Favorites" : "Save for Later"}
+  </Button>
+
+  {/* Already Cooked Button */}
+  <Button
+    variant="outlined"
+    startIcon={<Timer />}
+    onClick={() => toggleCookingHistory(selectedRecipe)}
+    sx={{
+      bgcolor: isCooked(selectedRecipe) ? "#4caf50" : "transparent",
+      color: isCooked(selectedRecipe) ? "white" : "black",
+      "&:hover": { bgcolor: "#4caf50", color: "white" },
+      borderColor: isCooked(selectedRecipe) ? "#4caf50" : "black",
+    }}
+  >
+    {isCooked(selectedRecipe) ? "Remove from History" : "Already Cooked?"}
+  </Button>
+</Box>
 
         {/* Recipe Description */}
         <Typography variant="body1" sx={{ marginTop: 2 }}>

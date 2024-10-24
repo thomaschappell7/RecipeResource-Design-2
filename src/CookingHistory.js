@@ -1,11 +1,7 @@
-// Favorites.js
 import MenuIcon from "@mui/icons-material/Menu";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useNavigate } from "react-router-dom";
-import {
-  FavoriteBorder,
-  Timer,
-} from "@mui/icons-material";
+import { FavoriteBorder, Timer } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -19,10 +15,13 @@ import {
   Divider,
   Card,
   Menu,
-  MenuItem, // Corrected import from "@mui/material"
+  MenuItem,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Header styling
 const Header = styled(Box)(({ theme }) => ({
@@ -40,14 +39,12 @@ const Header = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
-// Logo styling
 const Logo = styled("img")({
   width: "504px",
   height: "72px",
   objectFit: "cover",
 });
 
-// Custom styled card with hover effect
 const StyledCard = styled(Card)(({ theme }) => ({
   width: "100%",
   height: 320,
@@ -65,13 +62,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-// Divider styling
-const StyledDivider = styled(Divider)({
-  marginTop: "auto",
-  width: "100%",
-});
-
-// Custom TextField styling for Search
 const CustomTextField = styled(TextField)({
   "& .MuiInputBase-root": {
     backgroundColor: "#e2e2e2",
@@ -81,258 +71,317 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const Favorites = () => {
+const CookingHistory = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
-    const [anchorEl, setAnchorEl] = useState(null); // Declare anchorEl and setAnchorEl here
-    const [favorites] = useState([
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-    {
-      title: "Recipe Title",
-      description: "Description of favorite recipe.",
-      image: `${process.env.PUBLIC_URL}/assets/Image.png`,
-    },
-  ]);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [cookingHistory, setCookingHistory] = useState([]);
+    const [favorites, setFavorites] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [selectedRecipe, setSelectedRecipe] = useState(null);
+  
+    useEffect(() => {
+      const savedHistory = JSON.parse(localStorage.getItem("cookingHistory")) || [];
+      setCookingHistory(savedHistory);
+    }, []);
+  
+    const handleSearch = (event) => setSearchTerm(event.target.value);
+  
+    const filteredRecipes = cookingHistory.filter((recipe) =>
+      recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  
+    const isCooked = (recipe) => {
+      return recipe && cookingHistory.some((item) => item.id === recipe.id);
+    };
+  
+    const toggleCooked = (recipe) => {
+      if (!recipe) return;
+  
+      const updatedHistory = isCooked(recipe)
+        ? cookingHistory.filter((item) => item.id !== recipe.id)
+        : [...cookingHistory, recipe];
+  
+      setCookingHistory(updatedHistory);
+      localStorage.setItem("cookingHistory", JSON.stringify(updatedHistory));
+    };
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
+    const toggleFavorite = (recipe) => {
+        const updatedFavorites = favorites.some((fav) => fav.id === recipe.id)
+          ? favorites.filter((fav) => fav.id !== recipe.id)
+          : [...favorites, recipe];
+    
+        setFavorites(updatedFavorites);
+        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      };
+    
+      const isFavorite = (recipe) => {
+        if (!recipe) return false; // Ensure recipe is defined
+        return favorites.some((fav) => fav.id === recipe.id);
+      };
+  
+    const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+    const handleMenuClose = () => setAnchorEl(null);
+    const handleMenuClick = (path) => {
+      navigate(path);
+      handleMenuClose();
+    };
+  
+    const handleOpen = (recipe) => {
+      setSelectedRecipe(recipe);
+      setOpen(true);
+    };
+  
+    const handleClose = () => {
+      setOpen(false);
+      setSelectedRecipe(null);
+    };
+  
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: "100px",
+          alignItems: "center",
+        }}
+      >
+        <Header>
+          <IconButton
+            sx={{
+              position: "absolute",
+              top: "50%",
+              right: "16px",
+              transform: "translateY(-50%)",
+            }}
+            onClick={handleMenuOpen}
+          >
+            <MenuIcon />
+          </IconButton>
+  
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <MenuItem onClick={() => handleMenuClick("/recipes")}>Home Page</MenuItem>
+            <MenuItem onClick={() => handleMenuClick("/favorites")}>Favorite Recipes</MenuItem>
+            <MenuItem onClick={() => handleMenuClick("/cooking-history")}>Cooking History</MenuItem>
+            <MenuItem onClick={() => handleMenuClick("/account-settings")}>Account Settings</MenuItem>
+          </Menu>
+  
+          <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
+        </Header>
+  
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            width: "100%",
+            paddingLeft: "200px",
+            marginTop: 8,
+          }}
+        >
+          <FavoriteIcon sx={{ color: "#f29057", fontSize: "40px" }} />
+          <Typography variant="h3" sx={{ color: "#f29057" }}>
+            Cooking History
+          </Typography>
+        </Box>
+  
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            marginTop: 2,
+            justifyContent: "center",
+            width: "74%",
+          }}
+        >
+          <CustomTextField
+            value={searchTerm}
+            onChange={handleSearch}
+            variant="standard"
+            placeholder="Search"
+            fullWidth
+            InputProps={{ disableUnderline: true }}
+          />
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: "#f5a623",
+              color: "white",
+              "&:hover": { bgcolor: "#e6951c" },
+              height: "44px",
+              borderRadius: "4px",
+            }}
+          >
+            Filter
+          </Button>
+        </Box>
+  
+        <Box sx={{ marginTop: 4, width: "100%", display: "flex", justifyContent: "center" }}>
+          <Grid container spacing={5} sx={{ maxWidth: "1200px" }}>
+            {filteredRecipes.length > 0 ? (
+              filteredRecipes.map((recipe, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <StyledCard onClick={() => handleOpen(recipe)}>
+                    <CardMedia component="img" height="150" image={recipe.image} alt={recipe.title} />
+                    <CardContent>
+                      <Typography variant="h6">{recipe.title}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {recipe.description}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Timer fontSize="small" />
+                      <Typography variant="caption">{recipe.time}</Typography>
+                    </CardActions>
+                  </StyledCard>
+                </Grid>
+              ))
+            ) : (
+              <Typography>No recipes in cooking history yet.</Typography>
+            )}
+          </Grid>
+        </Box>
+  
+        <Dialog
+  open={open}
+  onClose={handleClose}
+  maxWidth="md"
+  fullWidth
+  sx={{
+    "& .MuiDialog-paper": {
+      borderRadius: "12px",
+      padding: "16px",
+      maxHeight: "80vh",
+    },
+  }}
+>
+  <DialogContent>
+    <Box sx={{ display: "flex", gap: 2 }}>
+      {/* Image Section */}
+      <img
+        src={selectedRecipe?.image}
+        alt={selectedRecipe?.title}
+        style={{
+          width: "40%",
+          height: "auto",
+          borderRadius: "8px",
+          objectFit: "cover",
+          maxWidth: "100%",
+        }}
+      />
 
-  const filteredRecipes = favorites.filter((recipe) =>
-    recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      {/* Recipe Details Section */}
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="h4" gutterBottom>
+          {selectedRecipe?.title}
+        </Typography>
 
-  // Menu handlers
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+        {/* Timer and Duration */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, marginTop: 1 }}>
+          <Timer fontSize="small" />
+          <Typography variant="body2" color="textSecondary">
+            {selectedRecipe?.time}
+          </Typography>
+        </Box>
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+        {/* Save for Later and Already Cooked Buttons */}
+        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+  {/* Save for Later Button */}
+  <Button
+    variant="outlined"
+    startIcon={<FavoriteBorder />}
+    onClick={() => toggleFavorite(selectedRecipe)}
+    sx={{
+      bgcolor: isFavorite(selectedRecipe) ? "#e6951c" : "transparent",
+      color: isFavorite(selectedRecipe) ? "white" : "black",
+      "&:hover": { bgcolor: "#e6951c", color: "white" },
+      borderColor: isFavorite(selectedRecipe) ? "#e6951c" : "black",
+    }}
+  >
+    {isFavorite(selectedRecipe) ? "Remove from Favorites" : "Save for Later"}
+  </Button>
 
-  const handleMenuClick = (path) => {
-    navigate(path);
-    handleMenuClose();
-  };
+  {/* Already Cooked Button */}
+  <Button
+    variant="outlined"
+    startIcon={<Timer />}
+    onClick={() => toggleCooked(selectedRecipe)}
+    sx={{
+      bgcolor: isCooked(selectedRecipe) ? "#4caf50" : "transparent",
+      color: isCooked(selectedRecipe) ? "white" : "black",
+      "&:hover": { bgcolor: "#4caf50", color: "white" },
+      borderColor: isCooked(selectedRecipe) ? "#4caf50" : "black",
+    }}
+  >
+    {isCooked(selectedRecipe) ? "Remove from History" : "Already Cooked?"}
+  </Button>
+</Box>
 
-  return (
+        {/* Recipe Description */}
+        <Typography variant="body1" sx={{ marginTop: 2 }}>
+          {selectedRecipe?.description}
+        </Typography>
+
+        {/* Ingredient List */}
+        <Typography variant="subtitle1" sx={{ marginTop: 2, marginBottom: 0 }}>
+          Ingredient List:
+        </Typography>
+        <ul style={{ marginTop: 0, paddingLeft: "20px" }}>
+          {selectedRecipe?.ingredients?.map((ingredient, index) => (
+            <li key={index}>
+              <Typography variant="body2" color="textSecondary" component="span">
+                {ingredient}
+              </Typography>
+            </li>
+          ))}
+        </ul>
+      </Box>
+    </Box>
+
+    {/* Divider Line */}
+    <Divider sx={{ marginY: 2 }} />
+
+    {/* Scrollable Cooking Instructions */}
     <Box
       sx={{
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        paddingTop: "100px",
-        alignItems: "center",
+        maxHeight: "30vh",
+        overflowY: "auto",
+        paddingRight: 1,
       }}
     >
-      {/* Header Section */}
-      <Header>
-        <IconButton
-          sx={{
-            position: "absolute",
-            top: "50%",
-            right: "16px",
-            transform: "translateY(-50%)",
-          }}
-          onClick={handleMenuOpen}
-        >
-          <MenuIcon />
-        </IconButton>
-
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          <MenuItem onClick={() => handleMenuClick("/recipes")}>Home Page</MenuItem>
-          <MenuItem onClick={() => handleMenuClick("/favorites")}>Favorite Recipes</MenuItem>
-          <MenuItem onClick={() => handleMenuClick("/Cooking-History")}>Cooking History</MenuItem>
-          <MenuItem onClick={() => handleMenuClick("/account-settings")}>Account Settings</MenuItem>
-        </Menu>
-
-        <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
-      </Header>
-
-      {/* Title Section with Timer Icon */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          width: "100%", // Take full width to align left
-          paddingLeft: "200px", // Add left padding
-          marginTop: 8,
-        }}
-      >
-        <FavoriteIcon sx={{ color: "#f29057", fontSize: "40px" }} />
-        <Typography
-          variant="h3"
-          sx={{ fontFamily: "Nunito-Bold, Helvetica", color: "#f29057" }}
-        >
-          Cooking History
-        </Typography>
+      <Typography variant="h5" gutterBottom>
+        Cooking Instructions
+      </Typography>
+      <Box>
+        {selectedRecipe?.instructions?.map((step, index) => (
+          <Typography variant="body2" key={index} gutterBottom>
+            {step}
+          </Typography>
+        ))}
       </Box>
-
-      {/* Search Section */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 2,
-          marginTop: 2,
-          justifyContent: "center", // Centers the search section
-          width: { xs: "100%", sm: "600px", md: "900px" },
-          width: "74%"
-        }}
-      >
-        <CustomTextField
-          value={searchTerm}
-          onChange={handleSearch}
-          variant="standard"
-          placeholder="Search"
-          fullWidth
-          InputProps={{ disableUnderline: true }}
-        />
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: "#f5a623",
-            color: "white",
-            "&:hover": { bgcolor: "#e6951c" },
-            height: "44px",
-            borderRadius: "4px",
-          }}
-        >
-          Filter
-        </Button>
-      </Box>
-
-      {/* Favorite Recipes Section */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center", // Centers the recipe grid
-          marginTop: 4,
-          width: "100%",
-        }}
-      >
-        <Grid
-          container
-          spacing={5}
-          sx={{ maxWidth: "1200px" }} // Ensure the grid doesn’t exceed this width
-        >
-          {filteredRecipes.map((recipe, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <StyledCard>
-                <CardMedia
-                  component="img"
-                  height="150"
-                  image={recipe.image}
-                  alt="Recipe Image"
-                />
-                <CardContent>
-                  <Typography variant="h6" color="#1d1b20">
-                    {recipe.title}
-                  </Typography>
-
-                  {/* Dots representing rating */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {[...Array(5)].map((_, i) => (
-                      <img
-                        key={i}
-                        src={`${process.env.PUBLIC_URL}/assets/image%20${i + 11}.png`}
-                        alt={`Dot ${i + 11}`}
-                        width={22}
-                        height={22}
-                        style={{ transform: "scale(0.9)" }}
-                      />
-                    ))}
-                  </Box>
-
-                  <Typography variant="body2" color="#49454F">
-                    {recipe.description}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <FavoriteBorder />
-                  <Timer fontSize="small" />
-                  <Typography variant="caption" color="#f20597">
-                    20 min
-                  </Typography>
-                </CardActions>
-              </StyledCard>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-
-      <Typography
-        variant="h4"
-        color="primary"
-        sx={{ 
-            marginTop: 10,
-            marginBottom: 5, 
-            cursor: "pointer", 
-            textAlign: "left", // Align the text to the left
-            width: "100%", // Take the full width of the parent container
-            paddingLeft: "200px", // Add padding if needed to match layout
-            textDecoration: "underline",
-        }}
-        onClick={() => navigate("/recipes")}
-        >
-        Find more!
-        </Typography>
-      {/* Divider and Footer */}
-      <StyledDivider sx={{ marginY: 4 }} />
-      <Box sx={{ height: "50px" }} /> {/* Blank Footer */}
-
-      <StyledDivider />
     </Box>
-  );
-};
+  </DialogContent>
 
-export default Favorites;
+  <DialogActions>
+    <Button onClick={handleClose} color="primary">
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+
+  
+        <Divider />
+      </Box>
+    );
+  };
+  
+  export default CookingHistory;
