@@ -4,8 +4,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline"; // Optional: Reset CSS styles
 import SignIn from "./SignIn";
 import Recipes from './Recipes';
-//import FavoriteRecipes from "./FavoriteRecipes";
-//import CookingHistory from "./CookingHistory";
+import Favorites from "./Favorites";
+import CookingHistory from "./CookingHistory";
 import AccountSettings from "./AccountSettings";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
@@ -56,8 +56,8 @@ function App() {
                   ) : (
                       <>
                           <Route path="/recipes" element={<Recipes />} />
-                          {/*<Route path="/favorite-recipes" element={<FavoriteRecipes />} />*/}
-                          {/*<Route path="/cooking-history" element={<CookingHistory />} />*/}
+                          {<Route path="/favorites" element={<Favorites />} />}
+                          {<Route path="/cooking-history" element={<CookingHistory />} />}
                               <Route path="/account-settings" element={<AccountSettings onSignOut={handleSignOut} />} />
                           <Route path="*" element={<Navigate to="/recipes" />} />
                       </>
