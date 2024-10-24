@@ -15,7 +15,7 @@ export const recipesData = [
             "Step 4: Stir in the Parmesan cheese and cooked pasta.",
             "Step 5: Combine and cook for another 5 minutes before serving."
         ],
-        rating: 4.7,
+        rating: 5,
         dietaryRestrictions: ["No shellfish", "No eggs", "No nuts"],
     },
     {
@@ -34,7 +34,7 @@ export const recipesData = [
             "Step 4: Stir in butter and Parmesan cheese.",
             "Step 5: Combine with cooked pasta and serve immediately."
         ],
-        rating: 4.5,
+        rating: 5,
         dietaryRestrictions: ["No meat", "No shellfish", "No eggs", "No nuts"],
     },
     {
@@ -51,7 +51,7 @@ export const recipesData = [
             "Step 2: Fry the chicken in olive oil until golden brown.",
             "Step 3: Serve with marinara sauce and a side of pasta."
         ],
-        rating: 4.8,
+        rating: 5,
         dietaryRestrictions: ["No shellfish", "No eggs", "No nuts"],
     },
     {
@@ -69,7 +69,7 @@ export const recipesData = [
             "Step 3: Add garlic and cook for 1 minute.",
             "Step 4: Toss in the pasta and Parmesan cheese before serving."
         ],
-        rating: 4.4,
+        rating: 4,
         dietaryRestrictions: ["No meat", "No gluten", "No shellfish", "No eggs", "No nuts"],
     },
     {
@@ -87,7 +87,7 @@ export const recipesData = [
             "Step 3: Toss spinach, avocado, and peppers in olive oil and garlic dressing.",
             "Step 4: Add chicken on top and serve."
         ],
-        rating: 4.6,
+        rating: 4,
         dietaryRestrictions: ["No gluten", "No lactose", "No shellfish", "No eggs", "No nuts"],
     },
     {
@@ -105,7 +105,7 @@ export const recipesData = [
             "Step 3: Mix the rice, beans, tomatoes, and sauteed onions together.",
             "Step 4: Stuff the bell peppers with the mixture and bake for 30 minutes."
         ],
-        rating: 4.7,
+        rating: 5,
         dietaryRestrictions: ["No meat", "No gluten", "No lactose", "No shellfish", "No eggs", "No nuts"],
     },
     {
@@ -123,7 +123,7 @@ export const recipesData = [
             "Step 3: Toss in the pasta and fresh basil.",
             "Step 4: Garnish with Parmesan cheese and serve."
         ],
-        rating: 4.3,
+        rating: 5,
         dietaryRestrictions: ["No meat", "No gluten", "No shellfish", "No eggs", "No nuts"],
     },
 ];

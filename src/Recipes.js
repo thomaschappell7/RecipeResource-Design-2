@@ -585,7 +585,7 @@ const Recipes = () => {
 
         {/* Dots representing rating */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {[...Array(5)].map((_, index) => (
+          {[...Array(selectedRecipe?.rating)].map((_, index) => (
             <img
               key={index}
               src={`${process.env.PUBLIC_URL}/assets/image%20${index + 11}.png`}
