@@ -591,7 +591,7 @@ const Recipes = () => {
                     {recipe.description}
                   </Typography>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{pt: 0}}>
                     <IconButton
                         onClick={(e) => {
                         e.stopPropagation(); // Prevent triggering card click

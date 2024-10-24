@@ -183,12 +183,14 @@ const CookingHistory = () => {
             alignItems: "center",
             gap: 1,
             width: "100%",
-            paddingLeft: "200px",
             marginTop: 8,
+            pl: 27.5,
           }}
         >
           <FavoriteIcon sx={{ color: "#f29057", fontSize: "40px" }} />
-          <Typography variant="h3" sx={{ color: "#f29057" }}>
+          <Typography variant="h3" sx={{ fontFamily: "Nunito-Medium, Helvetica",
+              fontWeight: "bold",
+              color: '#EC8D58' }}>
             Cooking History
           </Typography>
         </Box>
@@ -209,7 +211,7 @@ const CookingHistory = () => {
             variant="standard"
             placeholder="Search"
             fullWidth
-            InputProps={{ disableUnderline: true }}
+            InputProps={{ disableUnderline: true, style: { paddingLeft: "10px" } }}
           />
           <Button
             variant="contained"
@@ -221,11 +223,11 @@ const CookingHistory = () => {
               borderRadius: "4px",
             }}
           >
-            Filter
+            Search
           </Button>
         </Box>
   
-        <Box sx={{ marginTop: 4, width: "100%", display: "flex", justifyContent: "center" }}>
+        <Box sx={{ marginTop: 4, width: "100%", display: "flex", justifyContent: "center", pr: 13 }}>
           <Grid container spacing={5} sx={{ maxWidth: "1200px" }}>
             {filteredRecipes.length > 0 ? (
               filteredRecipes.map((recipe, index) => (
@@ -246,7 +248,11 @@ const CookingHistory = () => {
                 </Grid>
               ))
             ) : (
-              <Typography>No recipes in cooking history yet.</Typography>
+              <Typography variant="h6" sx={{
+                  fontFamily: "Nunito-Medium, Helvetica",
+                  pl: 5, pt: 2.5
+                }}>
+                  No recipes in cooking history yet.</Typography>
             )}
           </Grid>
         </Box>

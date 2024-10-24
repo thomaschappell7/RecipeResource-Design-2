@@ -49,6 +49,7 @@ const StyledCard = styled(Card)({
   width: "100%",
   height: 320,
   display: "flex",
+    border: "1px solid #000000",
   flexDirection: "column",
   justifyContent: "space-between",
   padding: "8px",
@@ -82,10 +83,16 @@ const Favorites = () => {
     const [open, setOpen] = useState(false); // Dialog state
     const [selectedRecipe, setSelectedRecipe] = useState(null); // Selected recipe
 
+    const [cookingHistory, setCookingHistory] = useState([]);
+
+
+
   // Load favorites from localStorage when the component mounts
   useEffect(() => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     setFavorites(savedFavorites);
+      const savedHistory = JSON.parse(localStorage.getItem("cookingHistory")) || [];
+      setCookingHistory(savedHistory);
   }, []);
 
   const handleSearch = (event) => {
@@ -119,6 +126,20 @@ const Favorites = () => {
     setOpen(false);
     setSelectedRecipe(null);
   };
+    const isCooked = (recipe) => {
+        return recipe && cookingHistory.some((item) => item.id === recipe.id);
+    };
+
+    const toggleCooked = (recipe) => {
+        if (!recipe) return;
+
+        const updatedHistory = isCooked(recipe)
+            ? cookingHistory.filter((item) => item.id !== recipe.id)
+            : [...cookingHistory, recipe];
+
+        setCookingHistory(updatedHistory);
+        localStorage.setItem("cookingHistory", JSON.stringify(updatedHistory));
+    };
 
   const toggleFavorite = (recipe) => {
     const updatedFavorites = favorites.some((fav) => fav.id === recipe.id)
@@ -198,10 +219,13 @@ const Favorites = () => {
           width: "100%",
           paddingLeft: "200px",
           marginTop: 8,
+            pl: 27.5,
         }}
       >
         <FavoriteIcon sx={{ color: "#f29057", fontSize: "40px" }} />
-        <Typography variant="h3" sx={{ color: "#f29057" }}>
+        <Typography variant="h3" sx={{ fontFamily: "Nunito-Medium, Helvetica",
+            fontWeight: "bold",
+            color: '#EC8D58' }}>
           Favorites
         </Typography>
       </Box>
@@ -223,7 +247,7 @@ const Favorites = () => {
           variant="standard"
           placeholder="Search"
           fullWidth
-          InputProps={{ disableUnderline: true }}
+          InputProps={{ disableUnderline: true, style: { paddingLeft: "10px" } }}
         />
         <Button
           variant="contained"
@@ -235,12 +259,12 @@ const Favorites = () => {
             borderRadius: "4px",
           }}
         >
-          Filter
+          Search
         </Button>
       </Box>
 
       {/* Favorite Recipes Section */}
-      <Box sx={{ marginTop: 4, width: "100%", display: "flex", justifyContent: "center" }}>
+      <Box sx={{ marginTop: 4, width: "100%", display: "flex", justifyContent: "center", pr: 13 }}>
         <Grid container spacing={5} sx={{ maxWidth: "1200px" }}>
           {filteredRecipes.length > 0 ? (
             filteredRecipes.map((recipe) => (
@@ -248,12 +272,12 @@ const Favorites = () => {
                 <StyledCard onClick={() => handleOpen(recipe)}>
                   <CardMedia component="img" height="150" image={recipe.image} alt={recipe.title} />
                   <CardContent>
-                    <Typography variant="h6">{recipe.title}</Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography fontSize={18}>{recipe.title}</Typography>
+                    <Typography fontSize={14} color="textSecondary">
                       {recipe.description}
                     </Typography>
                   </CardContent>
-                  <CardActions>
+                  <CardActions sx={{pt: 0}}>
                     <IconButton onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe); }}>
                       <FavoriteBorder sx={{ color: isFavorite(recipe) ? "red" : "gray" }} />
                     </IconButton>
@@ -264,7 +288,10 @@ const Favorites = () => {
               </Grid>
             ))
           ) : (
-            <Typography>No favorite recipes yet. Start adding some!</Typography>
+            <Typography variant="h6" sx={{
+                fontFamily: "Nunito-Medium, Helvetica",
+                pl: 5, pt: 2.5
+            }}>No favorite recipes yet. Start adding some!</Typography>
           )}
         </Grid>
       </Box>
@@ -272,9 +299,59 @@ const Favorites = () => {
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogContent>
           <Box sx={{ display: "flex", gap: 2 }}>
-            <img src={selectedRecipe?.image} alt={selectedRecipe?.title} style={{ width: "40%", borderRadius: "8px" }} />
+              <img
+                  src={selectedRecipe?.image}
+                  alt={selectedRecipe?.title}
+                  style={{
+                      width: "40%",
+                      height: "auto",
+                      borderRadius: "8px",
+                      objectFit: "cover",
+                      maxWidth: "100%",
+                  }}
+              />
             <Box sx={{ flex: 1 }}>
               <Typography variant="h4">{selectedRecipe?.title}</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, marginTop: 1 }}>
+                    <Timer fontSize="small" />
+                    <Typography variant="body2" color="textSecondary">
+                        {selectedRecipe?.time}
+                    </Typography>
+                </Box>
+
+                {/* Save for Later and Already Cooked Buttons */}
+                <Box sx={{ display: "flex", gap: 2, marginTop: 2, pb: 2 }}>
+                    {/* Save for Later Button */}
+                    <Button
+                        variant="outlined"
+                        startIcon={<FavoriteBorder />}
+                        onClick={() => toggleFavorite(selectedRecipe)}
+                        sx={{
+                            bgcolor: isFavorite(selectedRecipe) ? "#e6951c" : "transparent",
+                            color: isFavorite(selectedRecipe) ? "white" : "black",
+                            "&:hover": { bgcolor: "#e6951c", color: "white" },
+                            borderColor: isFavorite(selectedRecipe) ? "#e6951c" : "black",
+
+                        }}
+                    >
+                        {isFavorite(selectedRecipe) ? "Remove from Favorites" : "Save for Later"}
+                    </Button>
+
+                    {/* Already Cooked Button */}
+                    <Button
+                        variant="outlined"
+                        startIcon={<Timer />}
+                        onClick={() => toggleCooked(selectedRecipe)}
+                        sx={{
+                            bgcolor: isCooked(selectedRecipe) ? "#4caf50" : "transparent",
+                            color: isCooked(selectedRecipe) ? "white" : "black",
+                            "&:hover": { bgcolor: "#4caf50", color: "white" },
+                            borderColor: isCooked(selectedRecipe) ? "#4caf50" : "black",
+                        }}
+                    >
+                        {isCooked(selectedRecipe) ? "Remove from History" : "Already Cooked?"}
+                    </Button>
+                </Box>
               <Typography>{selectedRecipe?.description}</Typography>
               <Divider sx={{ my: 2 }} />
               <Typography>Ingredients:</Typography>
@@ -283,20 +360,7 @@ const Favorites = () => {
                   <li key={index}>{ingredient}</li>
                 ))}
               </ul>
-              <Button
-          variant="outlined"
-          startIcon={<FavoriteBorder />}
-          sx={{
-            marginTop: 1,
-            bgcolor: isFavorite(selectedRecipe) ? "#e6951c" : "transparent",
-            color: isFavorite(selectedRecipe) ? "white" : "black",
-            "&:hover": { bgcolor: "#e6951c", color: "white" },
-            borderColor: isFavorite(selectedRecipe) ? "#e6951c" : "black",
-          }}
-          onClick={() => toggleFavorite(selectedRecipe)}
-        >
-          {isFavorite(selectedRecipe) ? "Remove from Favorites" : "Save for Later"}
-        </Button>
+
             </Box>
           </Box>
           {/* Divider Line */}
