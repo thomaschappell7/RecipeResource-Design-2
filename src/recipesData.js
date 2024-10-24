@@ -16,7 +16,7 @@ export const recipesData = [
             "Step 5: Combine and cook for another 5 minutes before serving."
         ],
         rating: 4.7,
-        dietaryRestrictions: [],
+        dietaryRestrictions: ["No shellfish", "No eggs", "No nuts"],
     },
     {
         id: 2,
@@ -35,7 +35,7 @@ export const recipesData = [
             "Step 5: Combine with cooked pasta and serve immediately."
         ],
         rating: 4.5,
-        dietaryRestrictions: ["No meat"],
+        dietaryRestrictions: ["No meat", "No shellfish", "No eggs", "No nuts"],
     },
     {
         id: 3,
@@ -52,7 +52,7 @@ export const recipesData = [
             "Step 3: Serve with marinara sauce and a side of pasta."
         ],
         rating: 4.8,
-        dietaryRestrictions: [],
+        dietaryRestrictions: ["No shellfish", "No eggs", "No nuts"],
     },
     {
         id: 4,
@@ -70,7 +70,7 @@ export const recipesData = [
             "Step 4: Toss in the pasta and Parmesan cheese before serving."
         ],
         rating: 4.4,
-        dietaryRestrictions: ["No meat"],
+        dietaryRestrictions: ["No meat", "No gluten", "No shellfish", "No eggs", "No nuts"],
     },
     {
         id: 5,
@@ -88,7 +88,7 @@ export const recipesData = [
             "Step 4: Add chicken on top and serve."
         ],
         rating: 4.6,
-        dietaryRestrictions: ["Gluten-free"],
+        dietaryRestrictions: ["No gluten", "No lactose", "No shellfish", "No eggs", "No nuts"],
     },
     {
         id: 6,
@@ -106,7 +106,7 @@ export const recipesData = [
             "Step 4: Stuff the bell peppers with the mixture and bake for 30 minutes."
         ],
         rating: 4.7,
-        dietaryRestrictions: ["No meat", "Gluten-free", "Dairy-free"],
+        dietaryRestrictions: ["No meat", "No gluten", "No lactose", "No shellfish", "No eggs", "No nuts"],
     },
     {
         id: 7,
@@ -124,6 +124,6 @@ export const recipesData = [
             "Step 4: Garnish with Parmesan cheese and serve."
         ],
         rating: 4.3,
-        dietaryRestrictions: ["No meat", "No egg", "No nuts", "No shellfish"],
+        dietaryRestrictions: ["No meat", "No gluten", "No shellfish", "No eggs", "No nuts"],
     },
 ];

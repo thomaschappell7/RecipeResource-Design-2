@@ -38,7 +38,7 @@ import { pantryData } from "./pantryData";
 
 
 // Restrictions Component
-const Restrictions = () => {
+const Restrictions = ({ selectedRestrictions, setSelectedRestrictions }) => {
     const restrictionOptions = [
       "No meat",
       "No nuts",
@@ -48,7 +48,7 @@ const Restrictions = () => {
       "No lactose",
     ];
   
-    const [selectedRestrictions, setSelectedRestrictions] = useState([]);
+    
   
     const handleCheckboxChange = (event) => {
       const { name, checked } = event.target;
@@ -177,17 +177,8 @@ const CustomTextField = styled(TextField)({
 });
 
 // Pantry Component with original size restored
-const Pantry = () => {
+const Pantry = ({ selectedPantryItems, setSelectedPantryItems }) => {
   const [openItems, setOpenItems] = useState({});
-
-  const [selectedPantryItems, setSelectedPantryItems] = useState({
-    essentials: [],
-    fruitsVeggies: [],
-    meats: [],
-    carbohydrates: [],
-    seasonings: []
-  });
-
   
 
   const handleToggle = (index) => {
@@ -310,6 +301,18 @@ const Recipes = () => {
     // Update favorite state to track favorites for each recipe
     const [favoriteRecipes, setFavoriteRecipes] = useState({});
 
+    const [selectedPantryItems, setSelectedPantryItems] = useState({
+        essentials: [],
+        fruitsVeggies: [],
+        meats: [],
+        carbohydrates: [],
+        seasonings: []
+    });
+
+    const [selectedRestrictions, setSelectedRestrictions] = useState([]);
+
+    const [filteredRecipes, setFilteredRecipes] = useState(recipesData);
+
     // Favorite toggle function
     const toggleFavorite = (index) => {
         setFavoriteRecipes((prevFavorites) => ({
@@ -321,6 +324,24 @@ const Recipes = () => {
     const handleSearch = (event) => {
       setSearchTerm(event.target.value);
     };
+
+    // filtering
+    const handleFilter = () => {
+        const selectedItems = Object.values(selectedPantryItems).flat();
+        const filtered = recipesData.filter((recipe) => {
+            const ingredientsMatch = recipe.ingredients.every(ingredient =>
+                selectedItems.includes(ingredient)
+            );
+            const restrictionsMatch = selectedRestrictions.every(restriction =>
+                recipe.dietaryRestrictions.includes(restriction)
+            );
+            return ingredientsMatch && restrictionsMatch;
+        });
+        setFilteredRecipes(filtered);
+    };
+
+
+
   
     const handleOpen = (recipe) => {
       setSelectedRecipe(recipe); // Set the selected recipe
@@ -332,7 +353,6 @@ const Recipes = () => {
       setSelectedRecipe(null); // Clear selected recipe
     };
   
-    const recipes = recipesData || [];
 
     {/*Menu Code*/ }
 
@@ -429,7 +449,8 @@ const Recipes = () => {
                 "&:hover": { bgcolor: "#e6951c" },
                 height: "44px",
                 borderRadius: "4px",
-            }}
+                    }}
+            onClick={handleFilter}
             >
             Filter
             </Button>
@@ -465,7 +486,7 @@ const Recipes = () => {
               maxWidth: "900px",
             }}
           >
-            {recipes.map((recipe, index) => (
+            {(filteredRecipes || []).map((recipe, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
               <StyledCard onClick={() => handleOpen(recipe)}>
                 <CardMedia
@@ -511,8 +532,12 @@ const Recipes = () => {
               ml: 10, // Move to the right
             }}
           >
-            <Pantry />
-            <Restrictions />
+            <Pantry
+                selectedPantryItems={selectedPantryItems}
+                setSelectedPantryItems={setSelectedPantryItems}/>
+            <Restrictions 
+                selectedRestrictions={selectedRestrictions}
+                setSelectedRestrictions={setSelectedRestrictions}/>
           </Box>
         </Box>
   

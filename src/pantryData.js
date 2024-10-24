@@ -16,7 +16,6 @@ export const pantryData = {
         "Avocado",
         "Onion",
         "Mushrooms",
-        "Garlic",
         "Sweet potatoes",
         "Black beans"        
     ],
@@ -43,6 +42,7 @@ export const pantryData = {
         "Paprika",
         "Cumin",
         "Oregano",
+        "Garlic",
         "Basil",
         "Chili powder"
     ]
