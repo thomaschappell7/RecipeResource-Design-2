@@ -31,7 +31,7 @@ import {
   MenuItem
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { recipesData } from "./recipesData";
 import { pantryData } from "./pantryData";
@@ -48,7 +48,7 @@ const Restrictions = ({ selectedRestrictions, setSelectedRestrictions }) => {
       "No lactose",
     ];
   
-    
+
   
     const handleCheckboxChange = (event) => {
       const { name, checked } = event.target;
@@ -299,7 +299,15 @@ const Recipes = () => {
     const [selectedRecipe, setSelectedRecipe] = useState(null); // Store selected recipe info
 
     // Update favorite state to track favorites for each recipe
-    const [favoriteRecipes, setFavoriteRecipes] = useState({});
+    const [favorites, setFavorites] = useState(() => {
+        try {
+          const storedFavorites = JSON.parse(localStorage.getItem("favorites"));
+          return storedFavorites || [];
+        } catch (error) {
+          console.error("Failed to parse favorites from localStorage", error);
+          return [];
+        }
+      });
 
     const [selectedPantryItems, setSelectedPantryItems] = useState({
         essentials: [],
@@ -313,14 +321,87 @@ const Recipes = () => {
 
     const [filteredRecipes, setFilteredRecipes] = useState(recipesData);
 
-    // Favorite toggle function
-    const toggleFavorite = (index) => {
-        setFavoriteRecipes((prevFavorites) => ({
-            ...prevFavorites,
-            [index]: !prevFavorites[index], // Toggle the favorite status for the specific recipe
-        }));
+    // State to track cooking history
+    const [cookingHistory, setCookingHistory] = useState(() => {
+        try {
+            const storedHistory = JSON.parse(localStorage.getItem("cookingHistory"));
+            return storedHistory || [];
+        } catch (error) {
+            console.error("Failed to parse cooking history from localStorage", error);
+            return [];
+        }
+    });
+
+    // Sync cooking history with localStorage
+    useEffect(() => {
+        localStorage.setItem("cookingHistory", JSON.stringify(cookingHistory));
+    }, [cookingHistory]);
+
+    // Sync favorites with localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+    }, [favorites]);
+
+    // Toggle the favorite status of a recipe
+    const toggleFavorite = (recipe) => {
+        if (!recipe) return;
+
+        const isAlreadyFavorite = favorites.some((fav) => fav.id === recipe.id);
+
+        // Create a sanitized version of the recipe with only necessary properties
+        const sanitizedRecipe = {
+            id: recipe.id,
+            title: recipe.title,
+            description: recipe.description,
+            image: recipe.image,
+            time: recipe.time,
+            ingredients: recipe.ingredients,
+            instructions: recipe.instructions,
+        };
+
+        const updatedFavorites = isAlreadyFavorite
+            ? favorites.filter((fav) => fav.id !== recipe.id) // Remove if already a favorite
+            : [...favorites, sanitizedRecipe]; // Add sanitized recipe
+
+        setFavorites(updatedFavorites);
     };
-  
+
+    // Safely toggle cooking history
+    const toggleCooked = (recipe) => {
+        if (!recipe) return; // Ensure recipe is defined
+
+        const updatedHistory = isCooked(recipe)
+            ? cookingHistory.filter((item) => item.id !== recipe.id)
+            : [...cookingHistory, recipe];
+
+        setCookingHistory(updatedHistory);
+        localStorage.setItem("cookingHistory", JSON.stringify(updatedHistory));
+    };
+
+    // Toggle the cooking history status of a recipe
+    const toggleCookingHistory = (recipe) => {
+      const isAlreadyCooked = cookingHistory.some((item) => item.id === recipe.id);
+
+      const updatedHistory = isAlreadyCooked
+        ? cookingHistory.filter((item) => item.id !== recipe.id) // Remove if already cooked
+        : [...cookingHistory, recipe]; // Add if not cooked yet
+
+      setCookingHistory(updatedHistory);
+    };
+
+    // Check if the recipe exists before accessing its properties
+    const isFavorite = (recipe) => {
+      if (!recipe) return false; // Handle null or undefined recipe
+      return favorites.some((fav) => fav.id === recipe.id);
+    };
+
+    // Check if the recipe is already in cooking history
+    const isCooked = (recipe) => {
+      if (!recipe || !recipe.id) return false; // Safeguard to ensure recipe and id exist
+      return cookingHistory.some((item) => item.id === recipe.id);
+    };
+
+
     const handleSearch = (event) => {
       setSearchTerm(event.target.value);
     };
@@ -349,7 +430,7 @@ const Recipes = () => {
 
 
 
-  
+
     const handleOpen = (recipe) => {
       setSelectedRecipe(recipe); // Set the selected recipe
       setOpen(true); // Open the dialog
@@ -359,7 +440,7 @@ const Recipes = () => {
       setOpen(false); // Close the dialog
       setSelectedRecipe(null); // Clear selected recipe
     };
-  
+
 
     {/*Menu Code*/ }
 
@@ -421,11 +502,11 @@ const Recipes = () => {
                 >
                     {/* Menu Items */}
                     <MenuItem onClick={() => handleMenuClick('/recipes')}>Home Page</MenuItem>
-                    <MenuItem onClick={() => handleMenuClick('/favorite-recipes')}>Favorite Recipes</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick('/favorites')}>Favorite Recipes</MenuItem>
                     <MenuItem onClick={() => handleMenuClick('/cooking-history')}>Cooking History</MenuItem>
                     <MenuItem onClick={() => handleMenuClick('/account-settings')}>Account Settings</MenuItem>
                 </Menu>
-          <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
+                <Logo src={`${process.env.PUBLIC_URL}/assets/Logo.png`} alt="Logo" />
         </Header>
   
         {/* Search Section */}
@@ -511,18 +592,24 @@ const Recipes = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <FavoriteBorder
-                      onClick={(e) => {
+                    <IconButton
+                        onClick={(e) => {
                         e.stopPropagation(); // Prevent triggering card click
-                        toggleFavorite(index); // Pass the index to toggle favorite
-                      }}
-                      style={{ color: favoriteRecipes[index] ? 'red' : 'gray', cursor: 'pointer' }} // Change color based on favorite status
-                  />
-                  <Timer fontSize="small" />
-                  <Typography variant="caption" color="#f20597">
-                                {recipe.time}
-                  </Typography>
-                </CardActions>
+                        toggleFavorite(recipe); // Use the correct recipe object
+                        }}
+                    >
+                        <FavoriteBorder
+                        style={{
+                            color: isFavorite(recipe) ? "red" : "gray",
+                            cursor: "pointer",
+                        }}
+                        />
+                    </IconButton>
+                    <Timer fontSize="small" />
+                    <Typography variant="caption" color="#f20597">
+                        {recipe.time}
+                    </Typography>
+                    </CardActions>
               </StyledCard>
             </Grid>
             ))}
@@ -542,7 +629,7 @@ const Recipes = () => {
             <Pantry
                 selectedPantryItems={selectedPantryItems}
                 setSelectedPantryItems={setSelectedPantryItems}/>
-            <Restrictions 
+            <Restrictions
                 selectedRestrictions={selectedRestrictions}
                 setSelectedRestrictions={setSelectedRestrictions}/>
           </Box>
@@ -558,7 +645,7 @@ const Recipes = () => {
     "& .MuiDialog-paper": {
       borderRadius: "12px",
       padding: "16px",
-      maxHeight: "80vh", // Control max height of the dialog
+      maxHeight: "80vh",
     },
   }}
 >
@@ -566,16 +653,16 @@ const Recipes = () => {
     <Box sx={{ display: "flex", gap: 2 }}>
       {/* Image Section */}
       <img
-            src={selectedRecipe?.image}
-            alt="Recipe Image"
-            style={{
-                width: "40%",       
-                height: "auto",     
-                borderRadius: "8px", 
-                objectFit: "cover", 
-                maxWidth: "100%",  
-            }}
-        />
+        src={selectedRecipe?.image}
+        alt={selectedRecipe?.title}
+        style={{
+          width: "40%",
+          height: "auto",
+          borderRadius: "8px",
+          objectFit: "cover",
+          maxWidth: "100%",
+        }}
+      />
 
       {/* Recipe Details Section */}
       <Box sx={{ flex: 1 }}>
@@ -605,15 +692,38 @@ const Recipes = () => {
           </Typography>
         </Box>
 
-        {/* Save for Later Button */}
-        <Button
-          variant="outlined"
-          startIcon={<FavoriteBorder />}
-          sx={{ marginTop: 1 }}
-          onClick = {toggleFavorite}
-        >
-          Save for later
-        </Button>
+        {/* Save for Later and Already Cooked Buttons */}
+        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+  {/* Save for Later Button */}
+  <Button
+    variant="outlined"
+    startIcon={<FavoriteBorder />}
+    onClick={() => toggleFavorite(selectedRecipe)}
+    sx={{
+      bgcolor: isFavorite(selectedRecipe) ? "#e6951c" : "transparent",
+      color: isFavorite(selectedRecipe) ? "white" : "black",
+      "&:hover": { bgcolor: "#e6951c", color: "white" },
+      borderColor: isFavorite(selectedRecipe) ? "#e6951c" : "black",
+    }}
+  >
+    {isFavorite(selectedRecipe) ? "Remove from Favorites" : "Save for Later"}
+  </Button>
+
+  {/* Already Cooked Button */}
+  <Button
+    variant="outlined"
+    startIcon={<Timer />}
+    onClick={() => toggleCookingHistory(selectedRecipe)}
+    sx={{
+      bgcolor: isCooked(selectedRecipe) ? "#4caf50" : "transparent",
+      color: isCooked(selectedRecipe) ? "white" : "black",
+      "&:hover": { bgcolor: "#4caf50", color: "white" },
+      borderColor: isCooked(selectedRecipe) ? "#4caf50" : "black",
+    }}
+  >
+    {isCooked(selectedRecipe) ? "Remove from History" : "Already Cooked?"}
+  </Button>
+</Box>
 
         {/* Recipe Description */}
         <Typography variant="body1" sx={{ marginTop: 2 }}>
@@ -621,18 +731,18 @@ const Recipes = () => {
         </Typography>
 
         {/* Ingredient List */}
-                            <Typography variant="subtitle1" sx={{ marginTop: 2, marginBottom: 0 }}>
-                                Ingredient List:
-                            </Typography>
-                            <ul style={{ marginTop: 0, paddingLeft: '20px' }}>
-                                {selectedRecipe?.ingredients?.map((ingredient, index) => (
-                                    <li key={index}>
-                                        <Typography variant="body2" color="textSecondary" component="span">
-                                            {ingredient}
-                                        </Typography>
-                                    </li>
-                                ))}
-                            </ul>
+        <Typography variant="subtitle1" sx={{ marginTop: 2, marginBottom: 0 }}>
+          Ingredient List:
+        </Typography>
+        <ul style={{ marginTop: 0, paddingLeft: "20px" }}>
+          {selectedRecipe?.ingredients?.map((ingredient, index) => (
+            <li key={index}>
+              <Typography variant="body2" color="textSecondary" component="span">
+                {ingredient}
+              </Typography>
+            </li>
+          ))}
+        </ul>
       </Box>
     </Box>
 
@@ -642,23 +752,21 @@ const Recipes = () => {
     {/* Scrollable Cooking Instructions */}
     <Box
       sx={{
-        maxHeight: "30vh", // Limit the height of this section
-        overflowY: "auto", // Enable vertical scrolling
-        paddingRight: 1, // Add padding for scrollbar clearance
+        maxHeight: "30vh",
+        overflowY: "auto",
+        paddingRight: 1,
       }}
     >
       <Typography variant="h5" gutterBottom>
         Cooking Instructions
       </Typography>
-      <Typography variant="body2">
-        <Box>
-            {selectedRecipe?.instructions?.map((step, index) => (
-            <Typography variant="body2" key={index} gutterBottom>
-                {step}
-            </Typography>
-            ))}
-        </Box>
-      </Typography>
+      <Box>
+        {selectedRecipe?.instructions?.map((step, index) => (
+          <Typography variant="body2" key={index} gutterBottom>
+            {step}
+          </Typography>
+        ))}
+      </Box>
     </Box>
   </DialogContent>
 
