@@ -34,6 +34,7 @@ import { styled } from "@mui/system";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { recipesData } from "./recipesData";
+import { pantryData } from "./pantryData";
 
 
 // Restrictions Component
@@ -179,9 +180,35 @@ const CustomTextField = styled(TextField)({
 const Pantry = () => {
   const [openItems, setOpenItems] = useState({});
 
+  const [selectedPantryItems, setSelectedPantryItems] = useState({
+    essentials: [],
+    fruitsVeggies: [],
+    meats: [],
+    carbohydrates: [],
+    seasonings: []
+  });
+
+  
+
   const handleToggle = (index) => {
     setOpenItems((prev) => ({ ...prev, [index]: !prev[index] }));
   };
+
+  // Handle item selection
+  const handleItemClick = (category, item) => {
+    setSelectedPantryItems((prev) => {
+      const isSelected = prev[category].includes(item);
+      const updatedCategory = isSelected
+        ? prev[category].filter((i) => i !== item)
+        : [...prev[category], item];
+
+      return {
+        ...prev,
+        [category]: updatedCategory
+      };
+    });
+  };
+
 
   const pantryItems = [
     "Essentials",
@@ -218,7 +245,7 @@ const Pantry = () => {
       </Typography>
 
       <List>
-        {pantryItems.map((text, index) => (
+        {Object.keys(pantryData).map((category, index) => (
           <Box key={index}>
             <ListItemButton
               onClick={() => handleToggle(index)}
@@ -229,7 +256,7 @@ const Pantry = () => {
               }}
             >
               <ListItemText
-                primary={text}
+                primary={category.charAt(0).toUpperCase() + category.slice(1)}
                 primaryTypographyProps={{
                   fontFamily: "Nunito-Medium, Helvetica",
                   fontWeight: "medium",
@@ -244,9 +271,24 @@ const Pantry = () => {
             </ListItemButton>
             <Collapse in={openItems[index]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItem sx={{ pl: 4 }}>
-                  <ListItemText primary={`Sub-item for ${text}`} />
-                </ListItem>
+                {pantryData[category].map((item) => (
+                  <ListItem
+                    key={item}
+                    button
+                    onClick={() => handleItemClick(category, item)}
+                    sx={{
+                      pl: 4,
+                      bgcolor: selectedPantryItems[category].includes(item)
+                        ? "#f5a623"
+                        : "transparent",
+                      color: selectedPantryItems[category].includes(item)
+                        ? "white"
+                        : "inherit",
+                    }}
+                  >
+                    <ListItemText primary={item} />
+                  </ListItem>
+                ))}
               </List>
             </Collapse>
           </Box>
