@@ -335,7 +335,14 @@ const Recipes = () => {
             const restrictionsMatch = selectedRestrictions.every(restriction =>
                 recipe.dietaryRestrictions.includes(restriction)
             );
-            return ingredientsMatch && restrictionsMatch;
+            if (searchTerm === '') {
+                return ingredientsMatch && restrictionsMatch;
+            }
+            else {
+                const searchMatch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) || recipe.ingredients.map(ingredient => ingredient.toLowerCase()).some(ingredient => ingredient.includes(searchTerm.toLowerCase()));
+                return ingredientsMatch && restrictionsMatch && searchMatch;
+            }
         });
         setFilteredRecipes(filtered);
     };
@@ -452,7 +459,7 @@ const Recipes = () => {
                     }}
             onClick={handleFilter}
             >
-            Filter
+                    Search
             </Button>
         </Box>
   
