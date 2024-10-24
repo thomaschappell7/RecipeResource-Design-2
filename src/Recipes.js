@@ -416,12 +416,23 @@ const Recipes = () => {
             const restrictionsMatch = selectedRestrictions.every(restriction =>
                 recipe.dietaryRestrictions.includes(restriction)
             );
+
             if (searchTerm === '') {
                 return ingredientsMatch && restrictionsMatch;
+            }
+            else if (searchTerm !== '' && selectedItems.length === 0 && selectedRestrictions.length === 0){
+                const searchMatch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) || recipe.ingredients.map(ingredient => ingredient.toLowerCase()).some(ingredient => ingredient.includes(searchTerm.toLowerCase()));
+
+                console.log(searchTerm);
+                console.log("search");
+                console.log(searchMatch);
+                return searchMatch;
             }
             else {
                 const searchMatch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) || recipe.ingredients.map(ingredient => ingredient.toLowerCase()).some(ingredient => ingredient.includes(searchTerm.toLowerCase()));
+                
                 return ingredientsMatch && restrictionsMatch && searchMatch;
             }
         });
