@@ -187,7 +187,7 @@ const CustomTextField = styled(TextField)({
 });
 
 // Updated Pantry Component with Global Ingredient Search Functionality
-const Pantry = ({ selectedPantryItems, setSelectedPantryItems, searchPantry, setSearchPantry }) => {
+const Pantry = ({ selectedPantryItems, setSelectedPantryItems, searchPantry, setSearchPantry, handleFilter }) => {
   const [openItems, setOpenItems] = useState({});
 
   const handleToggle = (index) => {
@@ -256,7 +256,7 @@ const Pantry = ({ selectedPantryItems, setSelectedPantryItems, searchPantry, set
           fullWidth
           InputProps={{ disableUnderline: true, style: { paddingLeft: "10px" } }}
         />
-        <IconButton>
+              <IconButton onClick={handleFilter }>
           <Search />
         </IconButton>
       </Box>
